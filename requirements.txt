@@ -1,5 +1,5 @@
 ###### Requirements ######
-streamlit==0.76.0
+streamlit==1.11.1
 requests
 pillow
 numpy==1.22.0
