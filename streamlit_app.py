@@ -151,6 +151,11 @@ output_dict = r.json()
 confidences = [box['confidence'] for box in output_dict['predictions']]
 ## Generate list of classes.
 class_list = [box['class'] for box in output_dict['predictions']]
+## Generate list of bounding box coordinates
+x0 = [(box['x'] - box['width'] / 2) for box in output_dict['predictions']]
+x1 = [(box['x'] + box['width'] / 2) for box in output_dict['predictions']]
+y0 = [(box['y'] - box['height'] / 2) for box in output_dict['predictions']]
+y1 = [(box['y'] + box['height'] / 2) for box in output_dict['predictions']]
 
 json_tab, statistics_tab, project_tab = st.tabs(["JSON Output", "Prediction Statistics", "Project Info"])
 
@@ -172,7 +177,7 @@ with statistics_tab:
   st.pyplot(fig)
 
   ## Dataframe in main app with confidence level by class
-  predictions_df = pd.DataFrame(list(zip(class_list, confidences)), columns = ['Class', 'Confidence'])
+  predictions_df = pd.DataFrame(list(zip(class_list, confidences, x0, x1, y0, y1)), columns = ['Class', 'Confidence', 'x0', 'x1', 'y0', 'y1'])
   st.dataframe(predictions_df)
 
 with project_tab:
