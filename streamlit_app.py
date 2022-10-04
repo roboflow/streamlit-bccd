@@ -64,7 +64,7 @@ image.save(buffered, quality=90, format='JPEG')
 img_str = base64.b64encode(buffered.getvalue())
 img_str = img_str.decode('ascii')
 
-rf = Roboflow(api_key="3S78rMKsITa0tAwKKL8s")
+rf = Roboflow(api_key=f"{st.secrets['api_key']}")
 project = rf.workspace("mohamed-traore-2ekkp").project("boxes-on-a-conveyer-belt")
 # dataset = project.version(5).download("yolov5")
 version = project.version(5)
@@ -72,8 +72,8 @@ model = version.model
 
 ## Construct the URL to retrieve image.
 upload_url = ''.join([
-    'https://detect.roboflow.com/boxes-on-a-conveyer-belt-3',
-    '?api_key=3S78rMKsITa0tAwKKL8s',
+    'https://detect.roboflow.com/boxes-on-a-conveyer-belt/3',
+    f"?api_key={st.secrets['api_key']}",
     '&format=image',
     f'&overlap={overlap_threshold * 100}',
     f'&confidence={confidence_threshold * 100}',
@@ -100,8 +100,8 @@ st.image(image,
 
 ## Construct the URL to retrieve JSON.
 upload_url = ''.join([
-    'https://detect.roboflow.com/rf-bccd-bkpj9--1',
-    '?access_token=vbIBKNgIXqAQ'
+    'https://detect.roboflow.com/boxes-on-a-conveyer-belt/3',
+    f"?api_key={st.secrets['api_key']}"
 ])
 
 ## POST to the API.
