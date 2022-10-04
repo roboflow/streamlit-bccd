@@ -231,9 +231,5 @@ with st.form("project_access"):
   private_api_key = st.text_input('Private API Key', key='private_api_key', type='password',placeholder='Input Private API Key')
   submitted = st.form_submit_button("Verify and Load Model")
   if submitted:
-    st.session_state['workspace_id'] = workspace_id
-    st.session_state['model_id'] = model_id
-    st.session_state['version_number'] = version_number
-    st.session_state['private_api_key'] = private_api_key
     st.write("Loading model...")
     run_inference()
