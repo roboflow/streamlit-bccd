@@ -196,9 +196,9 @@ with project_tab:
   col4.json(version.preprocessing)
   col5.write('Augmentation steps applied:')
   col5.json(version.augmentation)
-  col6.metric(label='Train Set', value=version.splits['train'], delta=f"{(version.splits['train'] / project.splits['train']):.2%)}")
-  col6.metric(label='Valid Set', value=version.splits['valid'], delta=f"{(version.splits['valid'] / project.splits['valid']):.2%)}")
-  col6.metric(label='Test Set', value=version.splits['test'], delta=f"{(version.splits['test'] / project.splits['test']):.2%}")
+  col6.metric(label='Train Set', value=version.splits['train'], delta=f"{float(version.splits['train'] / project.splits['train']):.2%)}")
+  col6.metric(label='Valid Set', value=version.splits['valid'], delta=f"{float(version.splits['valid'] / project.splits['valid']):.2%)}")
+  col6.metric(label='Test Set', value=version.splits['test'], delta=f"{float(version.splits['test'] / project.splits['test']):.2%}")
   
   col7, col8, col9 = st.columns(3)
   col7.write(f"Annotation Group Name: {project.annotation}")
