@@ -29,7 +29,6 @@ st.sidebar.write("[Find additional images on Roboflow Universe.](https://univers
 confidence_threshold = st.sidebar.slider("Confidence threshold: What is the minimum acceptable confidence level for displaying a bounding box?", 0.0, 1.0, 0.5, 0.01)
 overlap_threshold = st.sidebar.slider("Overlap threshold: What is the maximum amount of overlap permitted between visible bounding boxes?", 0.0, 1.0, 0.5, 0.01)
 
-
 image = Image.open("./images/roboflow_logo.png")
 st.sidebar.image(image,
                  use_column_width=True)
@@ -45,14 +44,38 @@ st.sidebar.image(image,
 ## Title.
 st.write("# Roboflow Object Detection Tests")
 
-rf = Roboflow(api_key=f"{st.secrets['api_key']}")
-project = rf.workspace("mohamed-traore-2ekkp").project("boxes-on-a-conveyer-belt")
+workspace_id, model_id, version_number, private_api_key = ('', '', '', '')
+
+## store initial session state values
+if 'workspace_id' not in st.session_state:
+  st.session_state['workspace_id'] = ''
+if 'model_id' not in st.session_state:
+  st.session_state['model_id'] = ''
+if 'version_number' not in st.session_state:
+  st.session_state['version_number'] = ''
+if 'private_api_key' not in st.session_state:
+  st.session_state['private_api_key'] = ''
+
+with st.form("project_access"):
+  workspace_id = initialize_project.text_input('Workspace ID', key='workspace_id',
+                                               help='Finding Your Project Information: https://docs.roboflow.com/python#finding-your-project-information-manually',
+                                               placeholder='Input Workspace ID')
+  model_id = initialize_project.text_input('Model ID', key='model_id', placeholder='Input Model ID')
+  version_number = initialize_project.text_input('Trained Model Version Number', key='version_number', placeholder='Input Trained Model Version Number')
+  private_api_key = initialize_project.text_input('Private API Key', key='private_api_key', type='password',placeholder='Input Private API Key')
+  submitted = st.form_submit_button("Verify and Load Model")
+  if submitted:
+    st.write("Loading model...")
+
+rf = Roboflow(api_key=st.secrets['private_api_key']}"
+project = rf.workspace(st.secrets['workspace_id']).project(st.secrets['model_id'])
 project_metadata = project.get_version_information()
-# dataset = project.version(5).download("yolov5")
-version = project.version(5)
+# dataset = project.version(st.secrets['version_number']).download("yolov5")
+version = project.version(st.secrets['version_number])
 model = version.model
 
 project_type = st.write(f"#### Project Type: {project.type}")
+
 for version_number in range(len(project_metadata)):
   try:
     if int(project_metadata[version_number]['model']['id'].split('/')[1]) == int(version.version):
@@ -101,8 +124,8 @@ img_str = img_str.decode('ascii')
 
 ## Construct the URL to retrieve image.
 upload_url = ''.join([
-    'https://detect.roboflow.com/boxes-on-a-conveyer-belt/3',
-    f"?api_key={st.secrets['api_key']}",
+    f"https://detect.roboflow.com/{st.secrets['model_id']}/{st.secrets['version_number']}",
+    f"?api_key={st.secrets['private_api_key']}",
     '&format=image',
     f'&overlap={overlap_threshold * 100}',
     f'&confidence={confidence_threshold * 100}',
@@ -133,8 +156,8 @@ st.image(original_image,
 
 ## Construct the URL to retrieve JSON.
 upload_url = ''.join([
-    'https://detect.roboflow.com/boxes-on-a-conveyer-belt/3',
-    f"?api_key={st.secrets['api_key']}"
+    f"https://detect.roboflow.com/{st.secrets['model_id']}/{st.secrets['version_number']}",
+    f"?api_key={st.secrets['private_api_key']}"
 ])
 
 ## POST to the API.
