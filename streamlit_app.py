@@ -57,25 +57,24 @@ for version_number in range(len(project_metadata)):
   try:
     if int(project_metadata[version_number]['model']['id'].split('/')[1]) == int(version.version):
       project_endpoint = st.write(f"#### Inference Endpoint: {project_metadata[version_number]['model']['endpoint']}")
+      model_id = st.write(f"#### Model ID: {project_metadata['model']['id']}")
+      version_name  = st.write(f"#### Version Name: {project_metadata['name']}")
+      input_img_size = st.write(f"Input Image Size (pixels, px):")
+      width_metric, height_metric = st.column(2)
+      width_metric.metric(label='Pixel Width', value=project_metadata['preprocessing']['resize']['width'])
+      height_metric.metric(label='Pixel Height', value=project_metadata['preprocessing']['resize']['height'])
+
+      if project_metadata[version_number]['model']['fromScratch']:
+        train_checkpoint = 'Checkpoint'
+        st.write(f"#### Version trained from {train_checkpoint}")
+      elif project_metadata[version_number]['model']['fromScratch'] is False:
+        train_checkpoint = 'Scratch'
+        train_checkpoint = st.write(f"#### Version trained from {train_checkpoint}")
+      else:
+        train_checkpoint = 'Not Yet Trained'
+        train_checkpoint = st.write(f"#### Version is {train_checkpoint}")
   except KeyError:
     continue
-
-model_id = st.write(f"#### Model ID: {project_metadata['model']['id']}")
-version_name  = st.write(f"#### Version Name: {project_metadata['name']}")
-input_img_size = st.write(f"Input Image Size (pixels, px):")
-width_metric, height_metric = st.column(2)
-width_metric.metric(label='Pixel Width', value=project_metadata['preprocessing']['resize']['width'])
-height_metric.metric(label='Pixel Height', value=project_metadata['preprocessing']['resize']['height'])
-
-if project_metadata[version_number]['model']['fromScratch']:
-  train_checkpoint = 'Checkpoint'
-  st.write(f"#### Version trained from {train_checkpoint}")
-elif project_metadata[version_number]['model']['fromScratch'] is False:
-  train_checkpoint = 'Scratch'
-  train_checkpoint = st.write(f"#### Version trained from {train_checkpoint}")
-else:
-  train_checkpoint = 'Not Yet Trained'
-  train_checkpoint = st.write(f"#### Version is {train_checkpoint}")
 
 ## Pull in default image or user-selected image.
 if uploaded_file is None:
