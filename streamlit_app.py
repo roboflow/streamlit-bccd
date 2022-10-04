@@ -182,9 +182,9 @@ with project_tab:
       if int(project_metadata[version_number]['model']['id'].split('/')[1]) == int(version.version):
         col1.write(f'Total images in the version: {version.images}')
         col1.metric(label='Augmented Train Set Image Count', value=version.splits['train'])
-        col2.metric(label='mean Average Precision (mAP)', value=f"{project_metadata[version_number]['model']['map']:2%}")
-        col2.metric(label='Precision', value=f"{project_metadata[version_number]['model']['precision']:2%}")
-        col2.metric(label='Recall', value=f"{project_metadata[version_number]['model']['recall']:2%}")
+        col2.metric(label='mean Average Precision (mAP)', value=f"{float(project_metadata[version_number]['model']['map']):2%}")
+        col2.metric(label='Precision', value=f"{project_metadata[float(version_number]['model']['precision']):2%}")
+        col2.metric(label='Recall', value=f"{project_metadata[float(version_number]['model']['recall']):2%}")
         col3.metric(label='Train Set Image Count', value=project.splits['train'])
         col3.metric(label='Valid Set Image Count', value=project.splits['valid'])
         col3.metric(label='Test Set Image Count', value=project.splits['test'])
