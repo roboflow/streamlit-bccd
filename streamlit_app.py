@@ -17,11 +17,11 @@ from roboflow import Roboflow
 ##########
 
 def run_inference():
-  rf = Roboflow(api_key=st.secrets['private_api_key'])
-  project = rf.workspace(st.secrets['workspace_id']).project(st.secrets['model_id'])
+  rf = Roboflow(api_key=st.session_state['private_api_key'])
+  project = rf.workspace(st.session_state['workspace_id']).project(st.session_state['model_id'])
   project_metadata = project.get_version_information()
-  # dataset = project.version(st.secrets['version_number']).download("yolov5")
-  version = project.version(st.secrets['version_number'])
+  # dataset = project.version(st.session_state['version_number']).download("yolov5")
+  version = project.version(st.session_state['version_number'])
   model = version.model
 
   project_type = st.write(f"#### Project Type: {project.type}")
