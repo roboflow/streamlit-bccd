@@ -160,7 +160,7 @@ with statistics_tab:
   st.write('### Summary Statistics')
   with st.column():
     st.metric(label=f'Number of Bounding Boxes (ignoring overlap thresholds)', value='{len(confidences)}')
-    st.metric(label=f'Average Confidence Level of Bounding Boxes:, value='{(np.round(np.mean(confidences),4))}')
+    st.metric(label=f'Average Confidence Level of Bounding Boxes:', value='{(np.round(np.mean(confidences),4))}')
 
   ## Histogram in main app.
   st.write('### Histogram of Confidence Levels')
