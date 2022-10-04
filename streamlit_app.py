@@ -162,8 +162,8 @@ with json_tab:
 with statistics_tab:
   ## Summary statistics section in main app.
   st.write('### Summary Statistics')
-  st.metric(label=f'Number of Bounding Boxes (ignoring overlap thresholds)', value='{len(confidences)}')
-  st.metric(label=f'Average Confidence Level of Bounding Boxes:', value='{(np.round(np.mean(confidences),4))}')
+  st.metric(label='Number of Bounding Boxes (ignoring overlap thresholds)', value=f"{len(confidences)}")
+  st.metric(label='Average Confidence Level of Bounding Boxes:', value=f"{(np.round(np.mean(confidences),4))}")
 
   ## Histogram in main app.
   st.write('### Histogram of Confidence Levels')
@@ -176,15 +176,16 @@ with statistics_tab:
   st.dataframe(predictions_df)
 
 with project_tab:
+  st.write(f"Annotation Group Name: {project.annotation}")
   col1, col2, col3 = st.columns(3)
   for version_number in range(len(project_metadata)):
     try:
       if int(project_metadata[version_number]['model']['id'].split('/')[1]) == int(version.version):
         col1.write(f'Total images in the version: {version.images}')
         col1.metric(label='Augmented Train Set Image Count', value=version.splits['train'])
-        col2.metric(label='mean Average Precision (mAP)', value=f"{float(project_metadata[version_number]['model']['map']):2%}")
-        col2.metric(label='Precision', value=f"{float(project_metadata[version_number]['model']['precision']):2%}")
-        col2.metric(label='Recall', value=f"{float(project_metadata[version_number]['model']['recall']):2%}")
+        col2.metric(label='mean Average Precision (mAP)', value=f"{float(project_metadata[version_number]['model']['map']):.2%}")
+        col2.metric(label='Precision', value=f"{float(project_metadata[version_number]['model']['precision']):.2%}")
+        col2.metric(label='Recall', value=f"{float(project_metadata[version_number]['model']['recall']):.2%}")
         col3.metric(label='Train Set Image Count', value=project.splits['train'])
         col3.metric(label='Valid Set Image Count', value=project.splits['valid'])
         col3.metric(label='Test Set Image Count', value=project.splits['test'])
@@ -196,9 +197,6 @@ with project_tab:
   col4.json(version.preprocessing)
   col5.write('Augmentation steps applied:')
   col5.json(version.augmentation)
-  col6.metric(label='Train Set', value=version.splits['train'], delta=f"{float(version.splits['train'] / project.splits['train']):.2%}")
-  col6.metric(label='Valid Set', value=version.splits['valid'], delta=f"{float(version.splits['valid'] / project.splits['valid']):.2%}")
-  col6.metric(label='Test Set', value=version.splits['test'], delta=f"{float(version.splits['test'] / project.splits['test']):.2%}")
-  
-  col7, col8, col9 = st.columns(3)
-  col7.write(f"Annotation Group Name: {project.annotation}")
+  col6.metric(label='Train Set', value=version.splits['train'], delta=f"{float(version.splits['train'] / project.splits['train']):.2}")
+  col6.metric(label='Valid Set', value=version.splits['valid'], delta="No Change")
+  col6.metric(label='Test Set', value=version.splits['test'], delta="No Change")
