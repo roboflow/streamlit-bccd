@@ -106,8 +106,8 @@ def run_inference():
 
   ## Construct the URL to retrieve JSON.
   upload_url = ''.join([
-      f"https://detect.roboflow.com/{st.secrets['model_id']}/{st.secrets['version_number']}",
-      f"?api_key={st.secrets['private_api_key']}"
+      f"https://detect.roboflow.com/{st.session_state['model_id']}/{st.session_state['version_number']}",
+      f"?api_key={st.session_state['private_api_key']}"
   ])
 
   ## POST to the API.
