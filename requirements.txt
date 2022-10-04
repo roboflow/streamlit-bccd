@@ -1,8 +1,9 @@
 ###### Requirements ######
-streamlit==1.11.1
+streamlit
 requests
 pillow
-numpy==1.22.0
-matplotlib==3.3.2
+numpy
+matplotlib
 roboflow
 opencv-python
+pandas
