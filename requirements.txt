@@ -5,5 +5,4 @@ pillow
 numpy
 matplotlib
 roboflow
-opencv-python
 pandas
