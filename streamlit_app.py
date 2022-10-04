@@ -176,14 +176,14 @@ with project_tab:
   col1, col2, col3 = st.columns(3)
   for version_number in range(len(project_metadata)):
     if project_metadata[version_number]['model']['id'].split('/')[1] == version.version:
-    col1.write(f'Total images in the version: {version.images}')
-    col1.metric(label='Augmented Train Set Image Count', value=version.splits['train'])
-    col2.metric(label='mean Average Precision (mAP)', value=f'{project_metadata[version_number]['model']['map']:2%}')
-    col2.metric(label='Precision', value=f'{project_metadata[version_number]['model']['precision']:2%}')
-    col2.metric(label='Recall', value=f'{project_metadata[version_number]['model']['recall']:2%}')
-    col3.metric(label='Train Set Image Count', value=project.splits['train'])
-    col3.metric(label='Valid Set Image Count', value=project.splits['valid'])
-    col3.metric(label='Test Set Image Count', value=project.splits['test'])
+      col1.write(f'Total images in the version: {version.images}')
+      col1.metric(label='Augmented Train Set Image Count', value=version.splits['train'])
+      col2.metric(label='mean Average Precision (mAP)', value=f'{project_metadata[version_number]['model']['map']:2%}')
+      col2.metric(label='Precision', value=f'{project_metadata[version_number]['model']['precision']:2%}')
+      col2.metric(label='Recall', value=f'{project_metadata[version_number]['model']['recall']:2%}')
+      col3.metric(label='Train Set Image Count', value=project.splits['train'])
+      col3.metric(label='Valid Set Image Count', value=project.splits['valid'])
+      col3.metric(label='Test Set Image Count', value=project.splits['test'])
 
   col4, col5, col6 = st.columns(3)
   col4.write('Preprocessing steps applied:')
