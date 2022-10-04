@@ -162,9 +162,8 @@ with json_tab:
 with statistics_tab:
   ## Summary statistics section in main app.
   st.write('### Summary Statistics')
-  statistics_metrics = st.columns(1):
-  statistics_metrics.metric(label=f'Number of Bounding Boxes (ignoring overlap thresholds)', value='{len(confidences)}')
-  statistics_metrics.metric(label=f'Average Confidence Level of Bounding Boxes:', value='{(np.round(np.mean(confidences),4))}')
+  st.metric(label=f'Number of Bounding Boxes (ignoring overlap thresholds)', value='{len(confidences)}')
+  st.metric(label=f'Average Confidence Level of Bounding Boxes:', value='{(np.round(np.mean(confidences),4))}')
 
   ## Histogram in main app.
   st.write('### Histogram of Confidence Levels')
