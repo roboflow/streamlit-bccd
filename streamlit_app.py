@@ -12,6 +12,13 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from roboflow import Roboflow
 
+
+def unique(class_list):
+  list_set = set(class_list)
+  unique_classes = (list(list_set))
+  
+  return unique_classes
+
 ##########
 ##### Set up sidebar.
 ##########
