@@ -57,14 +57,18 @@ if 'private_api_key' not in st.session_state:
   st.session_state['private_api_key'] = ''
 
 with st.form("project_access"):
-  workspace_id = initialize_project.text_input('Workspace ID', key='workspace_id',
-                                               help='Finding Your Project Information: https://docs.roboflow.com/python#finding-your-project-information-manually',
-                                               placeholder='Input Workspace ID')
-  model_id = initialize_project.text_input('Model ID', key='model_id', placeholder='Input Model ID')
-  version_number = initialize_project.text_input('Trained Model Version Number', key='version_number', placeholder='Input Trained Model Version Number')
-  private_api_key = initialize_project.text_input('Private API Key', key='private_api_key', type='password',placeholder='Input Private API Key')
+  workspace_id = st.text_input('Workspace ID', key='workspace_id',
+                               help='Finding Your Project Information: https://docs.roboflow.com/python#finding-your-project-information-manually',
+                               placeholder='Input Workspace ID')
+  model_id = st.text_input('Model ID', key='model_id', placeholder='Input Model ID')
+  version_number = st.text_input('Trained Model Version Number', key='version_number', placeholder='Input Trained Model Version Number')
+  private_api_key = st.text_input('Private API Key', key='private_api_key', type='password',placeholder='Input Private API Key')
   submitted = st.form_submit_button("Verify and Load Model")
   if submitted:
+    st.session_state['workspace_id'] = workspace_id
+    st.session_state['model_id'] = model_id
+    st.session_state['version_number'] = version_number
+    st.session_state['private_api_key'] = private_api_key
     st.write("Loading model...")
 
 rf = Roboflow(api_key=st.secrets['private_api_key'])
