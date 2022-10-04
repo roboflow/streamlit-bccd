@@ -8,6 +8,7 @@ from base64 import decodebytes
 from io import BytesIO
 import numpy as np
 import matplotlib.pyplot as plt
+from roboflow import Roboflow
 
 ##########
 ##### Set up sidebar.
@@ -20,7 +21,7 @@ uploaded_file = st.sidebar.file_uploader('',
                                          type=['png', 'jpg', 'jpeg'],
                                          accept_multiple_files=False)
 
-st.sidebar.write('[Find additional images on Roboflow.](https://public.roboflow.com/object-detection/bccd/)')
+st.sidebar.write('[Find additional images on Roboflow.](https://universe.roboflow.com/)')
 
 ## Add in sliders.
 confidence_threshold = st.sidebar.slider('Confidence threshold: What is the minimum acceptable confidence level for displaying a bounding box?', 0.0, 1.0, 0.5, 0.01)
@@ -40,7 +41,7 @@ st.sidebar.image(image,
 ##########
 
 ## Title.
-st.write('# Blood Cell Count Object Detection')
+st.write('# Roboflow Object Detection Tests')
 
 ## Pull in default image or user-selected image.
 if uploaded_file is None:
@@ -63,10 +64,16 @@ image.save(buffered, quality=90, format='JPEG')
 img_str = base64.b64encode(buffered.getvalue())
 img_str = img_str.decode('ascii')
 
+rf = Roboflow(api_key="3S78rMKsITa0tAwKKL8s")
+project = rf.workspace("mohamed-traore-2ekkp").project("boxes-on-a-conveyer-belt")
+# dataset = project.version(5).download("yolov5")
+version = project.version(5)
+model = version.model
+
 ## Construct the URL to retrieve image.
 upload_url = ''.join([
-    'https://infer.roboflow.com/rf-bccd-bkpj9--1',
-    '?access_token=vbIBKNgIXqAQ',
+    'https://detect.roboflow.com/boxes-on-a-conveyer-belt-3',
+    '?api_key=3S78rMKsITa0tAwKKL8s',
     '&format=image',
     f'&overlap={overlap_threshold * 100}',
     f'&confidence={confidence_threshold * 100}',
@@ -93,7 +100,7 @@ st.image(image,
 
 ## Construct the URL to retrieve JSON.
 upload_url = ''.join([
-    'https://infer.roboflow.com/rf-bccd-bkpj9--1',
+    'https://detect.roboflow.com/rf-bccd-bkpj9--1',
     '?access_token=vbIBKNgIXqAQ'
 ])
 
@@ -124,3 +131,23 @@ st.pyplot(fig)
 ## Display the JSON in main app.
 st.write('### JSON Output')
 st.write(r.json())
+
+col1, col2, col3 = st.columns(3)
+col1.metric(label='Project Type', value=project.type)
+col2.metric(label='mean Average Precision (mAP)', value='- %')
+col2.metric(label='Precision', value='- %')
+col2.metric(label='Recall', value='- %')
+col3.metric(label='Train Set', value=project.splits['train'])
+col3.metric(label='Valid Set', value=project.splits['valid'])
+col3.metric(label='Test Set', value=project.splits['test'])
+
+col4, col5, col6 = st.columns(3)
+col4.write(f'Total images in the version: {version.images}')
+col5.write('Preprocessing steps applied:')
+col5.json(version.preprocessing)
+col5.write('Augmentation steps applied:')
+col5.json(version.augmentation)
+col5.metric(label='Augmented Train Set', value=version.splits['train'])
+col6.metric(label='Train Set', value=version.splits['train'], delta=f"{((version.splits['train'] / project.splits['train'])*100)}%")
+col6.metric(label='Valid Set', value=version.splits['valid'], delta=f"{((version.splits['valid'] / project.splits['valid'])*100)}%")
+col6.metric(label='Test Set', value=version.splits['test'], delta=f"{((version.splits['test'] / project.splits['test'])*100)}%")
