@@ -55,7 +55,7 @@ model = version.model
 project_type = st.write(f"#### Project Type: {project.type}")
 for version_number in range(len(project_metadata)):
     if project_metadata[version_number]['model']['id'].split('/')[1] == version.version:
-      project_endpoint = st.write(f"#### Inference Endpoint: {project_metadata[version_number]['model']['endpoint']}"})
+      project_endpoint = st.write(f"#### Inference Endpoint: {project_metadata[version_number]['model']['endpoint']}")
 
 model_id = st.write(f"#### Model ID: {project_metadata['model']['id']}")
 version_name  = st.write(f"#### Version Name: {project_metadata['name']}")
