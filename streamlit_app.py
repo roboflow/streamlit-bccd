@@ -71,7 +71,7 @@ rf = Roboflow(api_key=st.secrets['private_api_key'])
 project = rf.workspace(st.secrets['workspace_id']).project(st.secrets['model_id'])
 project_metadata = project.get_version_information()
 # dataset = project.version(st.secrets['version_number']).download("yolov5")
-version = project.version(st.secrets['version_number])
+version = project.version(st.secrets['version_number'])
 model = version.model
 
 project_type = st.write(f"#### Project Type: {project.type}")
