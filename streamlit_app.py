@@ -46,8 +46,8 @@ st.write('# Roboflow Object Detection Tests')
 ## Pull in default image or user-selected image.
 if uploaded_file is None:
     # Default image.
-    url = 'https://github.com/matthewbrems/streamlit-bccd/blob/master/BCCD_sample_images/BloodImage_00038_jpg.rf.6551ec67098bc650dd650def4e8a8e98.jpg?raw=true'
-    image = Image.open(requests.get(url, stream=True).raw)
+    default_img_path = 'images/test_box.jpg'
+    image = Image.open(default_img_path)
 
 else:
     # User-selected image.
