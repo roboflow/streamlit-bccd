@@ -197,6 +197,6 @@ with project_tab:
   col4.json(version.preprocessing)
   col5.write('Augmentation steps applied:')
   col5.json(version.augmentation)
-  col6.metric(label='Train Set', value=version.splits['train'], delta=f"{float(version.splits['train'] / project.splits['train']):2.2}")
+  col6.metric(label='Train Set', value=version.splits['train'], delta=f"{(float(version.splits['train'] / project.splits['train']))*100:.2}")
   col6.metric(label='Valid Set', value=version.splits['valid'], delta="No Change")
   col6.metric(label='Test Set', value=version.splits['test'], delta="No Change")
