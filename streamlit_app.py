@@ -59,7 +59,7 @@ for version_number in range(len(project_metadata)):
       project_endpoint = st.write(f"#### Inference Endpoint: {project_metadata[version_number]['model']['endpoint']}")
       model_id = st.write(f"#### Model ID: {project_metadata[version_number]['model']['id']}")
       version_name  = st.write(f"#### Version Name: {project_metadata[version_number]['name']}")
-      input_img_size = st.write(f"Input Image Size (pixels, px):")
+      input_img_size = st.write(f"Input Image Size for Model Training(pixels, px):")
       width_metric, height_metric = st.columns(2)
       width_metric.metric(label='Pixel Width', value=project_metadata[version_number]['preprocessing']['resize']['width'])
       height_metric.metric(label='Pixel Height', value=project_metadata[version_number]['preprocessing']['resize']['height'])
@@ -85,6 +85,8 @@ if uploaded_file is None:
 else:
     # User-selected image.
     image = Image.open(uploaded_file)
+
+original_image = image
 
 ## Subtitle.
 st.write('### Inferenced Image')
