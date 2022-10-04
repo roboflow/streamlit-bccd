@@ -67,7 +67,7 @@ with st.form("project_access"):
   if submitted:
     st.write("Loading model...")
 
-rf = Roboflow(api_key=st.secrets['private_api_key'])"
+rf = Roboflow(api_key=st.secrets['private_api_key'])
 project = rf.workspace(st.secrets['workspace_id']).project(st.secrets['model_id'])
 project_metadata = project.get_version_information()
 # dataset = project.version(st.secrets['version_number']).download("yolov5")
