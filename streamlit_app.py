@@ -12,13 +12,6 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from roboflow import Roboflow
 
-
-def unique(class_list):
-  list_set = set(class_list)
-  unique_classes = (list(list_set))
-  
-  return unique_classes
-
 ##########
 ##### Set up sidebar.
 ##########
@@ -178,14 +171,6 @@ with statistics_tab:
   ## Dataframe in main app with confidence level by class
   predictions_df = pd.DataFrame(list(zip(class_list, confidences)), columns = ['Class', 'Confidence'])
   st.dataframe(predictions_df)
-
-  ## Dataframe in main app to report minimum, maximum and average confidence values for each predicted class
-  prediction_stats_df = pd.DataFrame(list(zip([],[],[])), columns = ['Class', ' Average Confidence', 'Lowest Confidence', 'Highest Confidence'])
-  st.dataframe(prediction_stats_df
-  for unique_class in unique(class_list):
-    prediction_stats_df.add_rows(pandas.DataFrame([unique_class,
-                                                 f"{confidences.mean():3%}", f"{min(confidences):3%}", f"{max(confidences):3%}",
-                                                 columns = ['Average Confidence', 'Lowest Confidence', 'Highest Confidence']))
 
 with project_tab:
   col1, col2, col3 = st.columns(3)
