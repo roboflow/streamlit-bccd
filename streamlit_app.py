@@ -60,7 +60,7 @@ for version_number in range(len(project_metadata)):
       model_id = st.write(f"#### Model ID: {project_metadata[version_number]['model']['id']}")
       version_name  = st.write(f"#### Version Name: {project_metadata[version_number]['name']}")
       input_img_size = st.write(f"Input Image Size (pixels, px):")
-      width_metric, height_metric = st.column(2)
+      width_metric, height_metric = st.columns(2)
       width_metric.metric(label='Pixel Width', value=project_metadata[version_number]['preprocessing']['resize']['width'])
       height_metric.metric(label='Pixel Height', value=project_metadata[version_number]['preprocessing']['resize']['height'])
 
