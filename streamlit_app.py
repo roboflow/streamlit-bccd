@@ -241,7 +241,7 @@ uploaded_file = st.sidebar.file_uploader("",
                                         accept_multiple_files=False)
 
 st.sidebar.write("[Find additional images on Roboflow Universe.](https://universe.roboflow.com/)")
-st.sidebar.write("This project is publicly [available for viewing and download here](https://universe.roboflow.com/mohamed-traore-2ekkp/boxes-on-a-conveyer-belt/)")
+st.sidebar.write("[Improving Your Model with Active Learning](https://help.roboflow.com/implementing-active-learning)")
 
 ## Add in sliders.
 show_bbox = st.sidebar.radio("Show Bounding Boxes:",
