@@ -16,6 +16,10 @@ from roboflow import Roboflow
 
 ## store initial session state values
 workspace_id, model_id, version_number, private_api_key = ('', '', '', '')
+if 'confidence_threshold' not in st.session_state:
+    st.session_state['confidence_threshold'] = '40'
+if 'overlap_threshold' not in st.session_state:
+    st.session_state['overlap_threshold'] = '30'
 if 'workspace_id' not in st.session_state:
     st.session_state['workspace_id'] = ''
 if 'model_id' not in st.session_state:
@@ -263,8 +267,8 @@ show_box_type = st.sidebar.selectbox("Display Bounding Boxes As:",
                                     options=('regular', 'fill', 'blur'),
                                     key='box_type')
 
-confidence_threshold = st.sidebar.slider("Confidence threshold: What is the minimum acceptable confidence level for displaying a bounding box?", 0.0, 1.0, 0.5, 0.01)
-overlap_threshold = st.sidebar.slider("Overlap threshold: What is the maximum amount of overlap permitted between visible bounding boxes?", 0.0, 1.0, 0.5, 0.01)
+confidence_threshold = st.sidebar.slider("Confidence threshold (%): What is the minimum acceptable confidence level for displaying a bounding box?", 0, 100, 40, 1)
+overlap_threshold = st.sidebar.slider("Overlap threshold (%): What is the maximum amount of overlap permitted between visible bounding boxes?", 0, 100, 30, 1)
 
 image = Image.open("./images/roboflow_logo.png")
 st.sidebar.image(image,
