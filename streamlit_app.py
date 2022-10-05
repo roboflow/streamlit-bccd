@@ -38,8 +38,8 @@ if 'box_type' not in st.session_state:
 ##########
 #### Set up main app logic
 ##########
-def drawBoxes(model_object, img_path, include_class,
-              box_type, font = cv2.FONT_HERSHEY_SIMPLEX):
+def drawBoxes(model_object, img_path, show_bbox, show_class_label,
+              show_box_type, font = cv2.FONT_HERSHEY_SIMPLEX):
     
     collected_predictions = pd.DataFrame(columns=['class', 'confidence', 'x0', 'x1', 'y0', 'y1', 'box area'])
     img = cv2.imread(img_path)
@@ -65,12 +65,12 @@ def drawBoxes(model_object, img_path, include_class,
         # thickness = stroke width/thickness of bounding box
         start_point = (int(x0), int(y0))
         end_point = (int(x1), int(y1))
-        if box_type == 'regular':
-            if include_bbox == 'Yes':
+        if show_box_type == 'regular':
+            if show_bbox == 'Yes':
                 # draw/place bounding boxes on image
                 cv2.rectangle(img, start_point, end_point, color=(0,0,0), thickness=2)
 
-            if include_class == 'Show Labels':
+            if show_class_type == 'Show Labels':
                 # add class name with filled background
                 cv2.rectangle(img, (int(x0), int(y0)), (int(x0) + 40, int(y0) - 20), color=(0,0,0),
                         thickness=-1)
@@ -83,12 +83,12 @@ def drawBoxes(model_object, img_path, include_class,
                     thickness=1#thickness/"weight" of text
                     )
 
-        if box_type == 'fill':
-            if include_bbox == 'Yes':
+        if show_box_type == 'fill':
+            if show_bbox == 'Yes':
                 # draw/place bounding boxes on image
                 cv2.rectangle(img, start_point, end_point, color=(0,0,0), thickness=-1)
 
-            if include_class == 'Show Labels':
+            if show_class_type == 'Show Labels':
                 # add class name with filled background
                 cv2.rectangle(img, (int(x0), int(y0)), (int(x0) + 40, int(y0) - 20), color=(0,0,0),
                         thickness=-1)
@@ -101,12 +101,12 @@ def drawBoxes(model_object, img_path, include_class,
                     thickness=1#thickness/"weight" of text
                     )
 
-        if box_type == 'blur':
-            if include_bbox == 'Yes':
+        if show_box_type == 'blur':
+            if show_bbox == 'Yes':
                 # draw/place bounding boxes on image
                 cv2.rectangle(img, start_point, end_point, color=(0,0,0), thickness=2)
 
-            if include_class == 'Show Labels':
+            if show_class_type == 'Show Labels':
                 # add class name with filled background
                 cv2.rectangle(img, (int(x0), int(y0)), (int(x0) + 40, int(y0) - 20), color=(0,0,0),
                         thickness=-1)
@@ -173,8 +173,8 @@ def run_inference():
         original_opencv_image = open_cv_image
         # Display response image.
         pil_image_drawBoxes, df_drawBoxes, json_values = drawBoxes(model, default_img_path,
-                                                                   st.session_state['include_class'],
                                                                    st.session_state['include_bbox'],
+                                                                   st.session_state['include_class'],
                                                                    st.session_state['box_type'])
         
     else:
@@ -184,8 +184,8 @@ def run_inference():
         open_cv_image = cv2.imread(uploaded_file)
         # Display response image.
         pil_image_drawBoxes, df_drawBoxes, json_values = drawBoxes(model, uploaded_file,
-                                                                   st.session_state['include_class'],
                                                                    st.session_state['include_bbox'],
+                                                                   st.session_state['include_class'],
                                                                    st.session_state['box_type'])
     
     st.image(pil_image_drawBoxes,
