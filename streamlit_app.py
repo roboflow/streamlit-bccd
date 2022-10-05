@@ -36,8 +36,8 @@ if 'box_type' not in st.session_state:
 ##########
 #### Set up main app logic
 ##########
-def drawBoxes(model_object, img_path, font = cv2.FONT_HERSHEY_SIMPLEX,
-              view_img, include_bbox, include_class, box_type):
+def drawBoxes(model_object, img_path, view_img, include_class,
+              box_type, font = cv2.FONT_HERSHEY_SIMPLEX):
     
     collected_predictions = pd.DataFrame(columns=['class', 'confidence', 'x0', 'x1', 'y0', 'y1', 'box area'])
     img = cv2.imread(img_path)
