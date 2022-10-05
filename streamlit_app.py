@@ -168,6 +168,7 @@ def run_inference():
         # Default image.
         default_img_path = "images/test_box.jpg"
         image = Image.open(default_img_path)
+        original_image = image
         open_cv_image = cv2.imread(default_img_path)
         original_opencv_image = open_cv_image
         # Display response image.
