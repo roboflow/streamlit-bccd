@@ -29,9 +29,9 @@ if 'version_number' not in st.session_state:
 if 'private_api_key' not in st.session_state:
     st.session_state['private_api_key'] = ''
 if 'include_bbox' not in st.session_state:
-    st.session_state['include_bbox'] = True
+    st.session_state['include_bbox'] = 'Yes'
 if 'include_class' not in st.session_state:
-    st.session_state['include_class'] = True
+    st.session_state['include_class'] = 'Show Labels'
 if 'box_type' not in st.session_state:
     st.session_state['box_type'] = 'regular'
 
