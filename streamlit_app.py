@@ -34,7 +34,7 @@ if 'box_type' not in st.session_state:
 ##########
 #### Set up main app logic
 ##########
-def drawBoxes(model_object, open_cv_image, include_class,
+def drawBoxes(model_object, open_cv_image, img_path, include_class,
               box_type, font = cv2.FONT_HERSHEY_SIMPLEX):
     
     collected_predictions = pd.DataFrame(columns=['class', 'confidence', 'x0', 'x1', 'y0', 'y1', 'box area'])
@@ -165,20 +165,24 @@ def run_inference():
         default_img_path = "images/test_box.jpg"
         image = Image.open(default_img_path)
         open_cv_image = cv2.imread(default_img_path)
+        original_opencv_image = open_cv_image
+        # Display response image.
+        pil_image_drawBoxes, df_drawBoxes, json_values = drawBoxes(model, open_cv_image, default_image_path,
+                                                                   st.session_state['include_class'],
+                                                                   st.session_state['include_bbox'],
+                                                                   st.session_state['box_type'])
         
     else:
         # User-selected image.
         image = Image.open(uploaded_file)
+        original_image = image
         open_cv_image = cv2.imread(uploaded_file)
-
-    original_opencv_image = open_cv_image
-    original_image = image
+        # Display response image.
+        pil_image_drawBoxes, df_drawBoxes, json_values = drawBoxes(model, open_cv_image, uploaded_file,
+                                                                   st.session_state['include_class'],
+                                                                   st.session_state['include_bbox'],
+                                                                   st.session_state['box_type'])
     
-    # Display response image.
-    pil_image_drawBoxes, df_drawBoxes, json_values = drawBoxes(model, open_cv_image, st.session_state['include_class'],
-                                                               st.session_state['include_bbox'],
-                                                               st.session_state['box_type'])
-
     st.image(pil_image_drawBoxes,
             use_column_width=True)
     # Display original image.
