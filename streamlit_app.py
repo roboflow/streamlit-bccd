@@ -38,11 +38,11 @@ if 'box_type' not in st.session_state:
 ##########
 #### Set up main app logic
 ##########
-def drawBoxes(model_object, open_cv_image, img_path, include_class,
+def drawBoxes(model_object, img_path, include_class,
               box_type, font = cv2.FONT_HERSHEY_SIMPLEX):
     
     collected_predictions = pd.DataFrame(columns=['class', 'confidence', 'x0', 'x1', 'y0', 'y1', 'box area'])
-    img = open_cv_image
+    img = cv2.imread(img_path)
     # perform inference on the selected image
     predictions = model_object.predict(img_path, confidence=int(st.session_state['confidence_threshold']),
                                     overlap=st.session_state['overlap_threshold'])
@@ -58,7 +58,7 @@ def drawBoxes(model_object, open_cv_image, img_path, include_class,
         confidence_score = bounding_box['confidence']
         box = (x0, x1, y0, y1)
         collected_predictions = collected_predictions.append({'class':class_name, 'confidence':confidence_score,
-                                            'x0':x0, 'x1':x1, 'y0':y0, 'y1':y1, 'box area':box},
+                                            'x0':int(x0), 'x1':int(x1), 'y0':int(y0), 'y1':int(y1), 'box area':box},
                                             ignore_index=True)
         # position coordinates: start = (x0, y0), end = (x1, y1)
         # color = RGB-value for bounding box color, (0,0,0) is "black"
