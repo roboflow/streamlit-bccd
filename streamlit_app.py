@@ -38,14 +38,20 @@ if 'box_type' not in st.session_state:
 ##########
 #### Set up main app logic
 ##########
-def drawBoxes(model_object, img_path, show_bbox, show_class_label,
+def drawBoxes(model_object, img_object, uploaded_file, show_bbox, show_class_label,
               show_box_type, font = cv2.FONT_HERSHEY_SIMPLEX):
     
     collected_predictions = pd.DataFrame(columns=['class', 'confidence', 'x0', 'x1', 'y0', 'y1', 'box area'])
-    img = cv2.imread(img_path)
-    # perform inference on the selected image
-    predictions = model_object.predict(img_path, confidence=int(st.session_state['confidence_threshold']),
-                                    overlap=st.session_state['overlap_threshold'])
+    
+    if isinstance(uploaded_file, str)::
+        img = cv2.imread(uploaded_file)
+        # perform inference on the selected image
+        predictions = model_object.predict(uploaded_file, confidence=int(st.session_state['confidence_threshold']),
+                                           overlap=st.session_state['overlap_threshold'])
+    else:
+        predictions = model_object.predict(uploaded_file, confidence=int(st.session_state['confidence_threshold']),
+                                           overlap=st.session_state['overlap_threshold'])
+    
     predictions_json = predictions.json()
     # drawing bounding boxes with the Pillow library
     # https://docs.roboflow.com/inference/hosted-api#response-object-format
@@ -185,7 +191,7 @@ def run_inference():
         open_cv_image = cv2.imread(default_img_path)
         original_opencv_image = open_cv_image
         # Display response image.
-        pil_image_drawBoxes, df_drawBoxes, json_values = drawBoxes(model, default_img_path,
+        pil_image_drawBoxes, df_drawBoxes, json_values = drawBoxes(model, default_img_path, default_img_path,
                                                                    st.session_state['include_bbox'],
                                                                    st.session_state['include_class'],
                                                                    st.session_state['box_type'])
@@ -194,9 +200,12 @@ def run_inference():
         # User-selected image.
         image = Image.open(uploaded_file)
         original_image = image
-        open_cv_image = cv2.imread(uploaded_file)
+        opencv_convert = image.convert('RGB')
+        open_cv_image = numpy.array(opencv_convert)
+        # Convert RGB to BGR: OpenCV deals with BGR images rather than RGB
+        open_cv_image = open_cv_image[:, :, ::-1].copy() 
         # Display response image.
-        pil_image_drawBoxes, df_drawBoxes, json_values = drawBoxes(model, uploaded_file,
+        pil_image_drawBoxes, df_drawBoxes, json_values = drawBoxes(model, open_cv_image, uploaded_file,
                                                                    st.session_state['include_bbox'],
                                                                    st.session_state['include_class'],
                                                                    st.session_state['box_type'])
