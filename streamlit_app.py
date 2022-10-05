@@ -70,7 +70,7 @@ def drawBoxes(model_object, img_path, show_bbox, show_class_label,
                 # draw/place bounding boxes on image
                 cv2.rectangle(img, start_point, end_point, color=(0,0,0), thickness=2)
 
-            if show_class_type == 'Show Labels':
+            if show_class_label == 'Show Labels':
                 # add class name with filled background
                 cv2.rectangle(img, (int(x0), int(y0)), (int(x0) + 40, int(y0) - 20), color=(0,0,0),
                         thickness=-1)
@@ -88,7 +88,7 @@ def drawBoxes(model_object, img_path, show_bbox, show_class_label,
                 # draw/place bounding boxes on image
                 cv2.rectangle(img, start_point, end_point, color=(0,0,0), thickness=-1)
 
-            if show_class_type == 'Show Labels':
+            if show_class_label == 'Show Labels':
                 # add class name with filled background
                 cv2.rectangle(img, (int(x0), int(y0)), (int(x0) + 40, int(y0) - 20), color=(0,0,0),
                         thickness=-1)
@@ -106,7 +106,7 @@ def drawBoxes(model_object, img_path, show_bbox, show_class_label,
                 # draw/place bounding boxes on image
                 cv2.rectangle(img, start_point, end_point, color=(0,0,0), thickness=2)
 
-            if show_class_type == 'Show Labels':
+            if show_class_label == 'Show Labels':
                 # add class name with filled background
                 cv2.rectangle(img, (int(x0), int(y0)), (int(x0) + 40, int(y0) - 20), color=(0,0,0),
                         thickness=-1)
