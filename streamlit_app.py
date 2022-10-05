@@ -5,6 +5,7 @@ import io
 from statistics import mean
 from PIL import Image
 import glob
+import cv2
 from base64 import decodebytes
 from io import BytesIO
 import numpy as np
@@ -15,193 +16,261 @@ from roboflow import Roboflow
 ##########
 #### Set up main app logic
 ##########
+def drawBoxes(model_object, img_path, font = cv2.FONT_HERSHEY_SIMPLEX,
+                view_img = st.session_state['image_view'], include_bbox = st.session_state['include_bbox'],
+                include_class = st.session_state['include_class'], box_type = st.session_state['box_type']):
+    
+    collected_predictions = pd.DataFrame(columns=['class', 'confidence', 'x0', 'x1', 'y0', 'y1', 'box area'])
+    img = cv2.imread(img_path)
+    # perform inference on the selected image
+    predictions = model_object.predict(img_path, confidence=int(st.session_state['confidence_threshold']),
+                                    overlap=st.session_state['overlap_threshold'])
+    predictions_json = predictions.json()
+    # drawing bounding boxes with the Pillow library
+    # https://docs.roboflow.com/inference/hosted-api#response-object-format
+    for bounding_box in predictions:
+        x0 = bounding_box['x'] - bounding_box['width'] / 2
+        x1 = bounding_box['x'] + bounding_box['width'] / 2
+        y0 = bounding_box['y'] - bounding_box['height'] / 2
+        y1 = bounding_box['y'] + bounding_box['height'] / 2
+        class_name = bounding_box['class']
+        confidence_score = bounding_box['confidence']
+        box = (x0, x1, y0, y1)
+        collected_predictions = collected_predictions.append({'class':class_name, 'confidence':confidence_score,
+                                            'x0':x0, 'x1':x1, 'y0':y0, 'y1':y1, 'box area':box},
+                                            ignore_index=True)
+        # position coordinates: start = (x0, y0), end = (x1, y1)
+        # color = RGB-value for bounding box color, (0,0,0) is "black"
+        # thickness = stroke width/thickness of bounding box
+        start_point = (int(x0), int(y0))
+        end_point = (int(x1), int(y1))
+        if box_type == 'regular':
+            if include_bbox:
+                # draw/place bounding boxes on image
+                cv2.rectangle(img, start_point, end_point, color=(0,0,0), thickness=2)
+
+            if include_class:
+                # add class name with filled background
+                cv2.rectangle(img, (int(x0), int(y0)), (int(x0) + 40, int(y0) - 20), color=(0,0,0),
+                        thickness=-1)
+                cv2.putText(img,
+                    class_name,#text to place on image
+                    (int(x0), int(y0) - 5),#location of text
+                    font,#font
+                    0.4,#font scale
+                    (255,255,255),#text color
+                    thickness=1#thickness/"weight" of text
+                    )
+
+        if box_type == 'fill':
+            if include_bbox:
+                # draw/place bounding boxes on image
+                cv2.rectangle(img, start_point, end_point, color=(0,0,0), thickness=-1)
+
+            if include_class:
+                # add class name with filled background
+                cv2.rectangle(img, (int(x0), int(y0)), (int(x0) + 40, int(y0) - 20), color=(0,0,0),
+                        thickness=-1)
+                cv2.putText(img,
+                    class_name,#text to place on image
+                    (int(x0), int(y0) - 5),#location of text
+                    font,#font
+                    0.4,#font scale
+                    (255,255,255),#text color
+                    thickness=1#thickness/"weight" of text
+                    )
+
+        if box_type == 'blur':
+            if include_bbox:
+                # draw/place bounding boxes on image
+                cv2.rectangle(img, start_point, end_point, color=(0,0,0), thickness=2)
+
+            if include_class:
+                # add class name with filled background
+                cv2.rectangle(img, (int(x0), int(y0)), (int(x0) + 40, int(y0) - 20), color=(0,0,0),
+                        thickness=-1)
+                cv2.putText(img,
+                    class_name,#text to place on image
+                    (int(x0), int(y0) - 5),#location of text
+                    font,#font
+                    0.4,#font scale
+                    (255,255,255),#text color
+                    thickness=1#thickness/"weight" of text
+                    )
+
+        # convert from openCV2 to PIL. Notice the COLOR_BGR2RGB which means that 
+        # the color is converted from BGR to RGB when going from OpenCV image to PIL image
+        color_converted = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+        pil_image = Image.fromarray(color_converted)
+
+    return pil_image, collected_predictions, predictions_json
+
 
 def run_inference():
-  rf = Roboflow(api_key=st.session_state['private_api_key'])
-  project = rf.workspace(st.session_state['workspace_id']).project(st.session_state['model_id'])
-  project_metadata = project.get_version_information()
-  # dataset = project.version(st.session_state['version_number']).download("yolov5")
-  version = project.version(st.session_state['version_number'])
-  model = version.model
+    ##########
+    ##### Set up sidebar.
+    ##########
+    workspace_id, model_id, version_number, private_api_key = ('', '', '', '')
 
-  project_type = st.write(f"#### Project Type: {project.type}")
+    ## store initial session state values
+    if 'workspace_id' not in st.session_state:
+        st.session_state['workspace_id'] = ''
+    if 'model_id' not in st.session_state:
+        st.session_state['model_id'] = ''
+    if 'version_number' not in st.session_state:
+        st.session_state['version_number'] = ''
+    if 'private_api_key' not in st.session_state:
+        st.session_state['private_api_key'] = ''
+    if 'image_view' not in st.session_state:
+        st.session_state['image_view']
+    if 'include_bbox' not in st.session_state:
+        st.session_state['include_bbox'] = True
+    if 'include_class' not in st.session_state:
+        st.session_state['include_class'] = True
+    if 'box_type' not in st.session_state:
+        st.session_state['box_type'] = 'regular'
 
-  for version_number in range(len(project_metadata)):
-    try:
-      if int(project_metadata[version_number]['model']['id'].split('/')[1]) == int(version.version):
-        project_endpoint = st.write(f"#### Inference Endpoint: {project_metadata[version_number]['model']['endpoint']}")
-        model_id = st.write(f"#### Model ID: {project_metadata[version_number]['model']['id']}")
-        version_name  = st.write(f"#### Version Name: {project_metadata[version_number]['name']}")
-        input_img_size = st.write(f"Input Image Size for Model Training(pixels, px):")
-        width_metric, height_metric = st.columns(2)
-        width_metric.metric(label='Pixel Width', value=project_metadata[version_number]['preprocessing']['resize']['width'])
-        height_metric.metric(label='Pixel Height', value=project_metadata[version_number]['preprocessing']['resize']['height'])
 
-        if project_metadata[version_number]['model']['fromScratch']:
-          train_checkpoint = 'Checkpoint'
-          st.write(f"#### Version trained from {train_checkpoint}")
-        elif project_metadata[version_number]['model']['fromScratch'] is False:
-          train_checkpoint = 'Scratch'
-          train_checkpoint = st.write(f"#### Version trained from {train_checkpoint}")
-        else:
-          train_checkpoint = 'Not Yet Trained'
-          train_checkpoint = st.write(f"#### Version is {train_checkpoint}")
-    except KeyError:
-      continue
+    # Add in location to select image.
+    st.sidebar.write("#### Select an image to upload.")
+    uploaded_file = st.sidebar.file_uploader("",
+                                            type=['png', 'jpg', 'jpeg'],
+                                            accept_multiple_files=False)
 
-  ## Pull in default image or user-selected image.
-  if uploaded_file is None:
-      # Default image.
-      default_img_path = "images/test_box.jpg"
-      image = Image.open(default_img_path)
+    st.sidebar.write("[Find additional images on Roboflow Universe.](https://universe.roboflow.com/)")
+    st.sidebar.write("This project is publicly [available for viewing and download here](https://universe.roboflow.com/mohamed-traore-2ekkp/boxes-on-a-conveyer-belt/)")
 
-  else:
-      # User-selected image.
-      image = Image.open(uploaded_file)
+    ## Add in sliders.
+    view_img = st.sidebar.radio("View Inference Image Result As:",
+                                options=['Regular Bounding Boxes', 'Filled Bounding Boxes', 'Blurred Bounding Boxes', 'Do Not View - JSON Only'],
+                                key='image_view')
+                                    
+    show_bbox = st.sidebar.radio("Show Bounding Boxes:",
+                                options=['Yes', 'No'],
+                                key='include_bbox')
 
-  original_image = image
+    show_class_label = st.sidebar.radio("Show Class Labels:",
+                                        options=['Show Labels', 'Hide Labels'],
+                                        key='include_class')
+                
+    show_box_type = st.sidebar.selectbox("Display Bounding Boxes As:",
+                                        options=('regular', 'fill', 'blur'),
+                                        key='box_type')
+                                        
+    confidence_threshold = st.sidebar.slider("Confidence threshold: What is the minimum acceptable confidence level for displaying a bounding box?", 0.0, 1.0, 0.5, 0.01)
+    overlap_threshold = st.sidebar.slider("Overlap threshold: What is the maximum amount of overlap permitted between visible bounding boxes?", 0.0, 1.0, 0.5, 0.01)
 
-  ## Subtitle.
-  st.write('### Inferenced Image')
+    image = Image.open("./images/roboflow_logo.png")
+    st.sidebar.image(image,
+                    use_column_width=True)
 
-  # Convert to JPEG Buffer.
-  buffered = io.BytesIO()
-  image.save(buffered, quality=90, format='JPEG')
+    image = Image.open("./images/streamlit_logo.png")
+    st.sidebar.image(image,
+                    use_column_width=True)
+    
+    rf = Roboflow(api_key=st.session_state['private_api_key'])
+    project = rf.workspace(st.session_state['workspace_id']).project(st.session_state['model_id'])
+    project_metadata = project.get_version_information()
+    # dataset = project.version(st.session_state['version_number']).download("yolov5")
+    version = project.version(st.session_state['version_number'])
+    model = version.model
 
-  # Base 64 encode.
-  img_str = base64.b64encode(buffered.getvalue())
-  img_str = img_str.decode('ascii')
+    project_type = st.write(f"#### Project Type: {project.type}")
 
-  ## Construct the URL to retrieve image.
-  upload_url = ''.join([
-      f"https://detect.roboflow.com/{st.session_state['model_id']}/{st.session_state['version_number']}",
-      f"?api_key={st.session_state['private_api_key']}",
-      '&format=image',
-      f'&overlap={overlap_threshold * 100}',
-      f'&confidence={confidence_threshold * 100}',
-      '&stroke=4',
-      '&labels=True'
-  ])
-
-  ## POST to the API.
-  r = requests.post(upload_url,
-                    data=img_str,
-                    headers={
-      'Content-Type': 'application/x-www-form-urlencoded'
-  })
-
-  image = Image.open(BytesIO(r.content))
-
-  # Convert to JPEG Buffer.
-  buffered = io.BytesIO()
-  image.save(buffered, quality=90, format='JPEG')
-
-  # Display response image.
-  st.image(image,
-           use_column_width=True)
-  # Display original image.
-  st.write("#### Original Image")
-  st.image(original_image,
-           use_column_width=True)
-
-  ## Construct the URL to retrieve JSON.
-  upload_url = ''.join([
-      f"https://detect.roboflow.com/{st.session_state['model_id']}/{st.session_state['version_number']}",
-      f"?api_key={st.session_state['private_api_key']}"
-  ])
-
-  ## POST to the API.
-  r = requests.post(upload_url,
-                    data=img_str,
-                    headers={
-      'Content-Type': 'application/x-www-form-urlencoded'
-  })
-
-  ## Save the JSON.
-  output_dict = r.json()
-
-  ## Generate list of confidences.
-  confidences = [box['confidence'] for box in output_dict['predictions']]
-  ## Generate list of classes.
-  class_list = [box['class'] for box in output_dict['predictions']]
-  ## Generate list of bounding box coordinates
-  x0 = [int(box['x'] - box['width'] / 2) for box in output_dict['predictions']]
-  x1 = [int(box['x'] + box['width'] / 2) for box in output_dict['predictions']]
-  y0 = [int(box['y'] - box['height'] / 2) for box in output_dict['predictions']]
-  y1 = [int(box['y'] + box['height'] / 2) for box in output_dict['predictions']]
-
-  json_tab, statistics_tab, project_tab = st.tabs(["JSON Output", "Prediction Statistics", "Project Info"])
-
-  with json_tab:
-    ## Display the JSON in main app.
-    st.write('### JSON Output')
-    st.write(r.json())
-
-  with statistics_tab:
-    ## Summary statistics section in main app.
-    st.write('### Summary Statistics')
-    st.metric(label='Number of Bounding Boxes (ignoring overlap thresholds)', value=f"{len(confidences)}")
-    st.metric(label='Average Confidence Level of Bounding Boxes:', value=f"{(np.round(np.mean(confidences),4))}")
-
-    ## Histogram in main app.
-    st.write('### Histogram of Confidence Levels')
-    fig, ax = plt.subplots()
-    ax.hist(confidences, bins=10, range=(0.0,1.0))
-    st.pyplot(fig)
-
-    ## Dataframe in main app with confidence level by class
-    predictions_df = pd.DataFrame(list(zip(class_list, confidences, x0, x1, y0, y1)), columns = ['Class', 'Confidence', 'x0', 'x1', 'y0', 'y1'])
-    st.dataframe(predictions_df)
-
-  with project_tab:
-    st.write(f"Annotation Group Name: {project.annotation}")
-    col1, col2, col3 = st.columns(3)
     for version_number in range(len(project_metadata)):
-      try:
-        if int(project_metadata[version_number]['model']['id'].split('/')[1]) == int(version.version):
-          col1.write(f'Total images in the version: {version.images}')
-          col1.metric(label='Augmented Train Set Image Count', value=version.splits['train'])
-          col2.metric(label='mean Average Precision (mAP)', value=f"{float(project_metadata[version_number]['model']['map'])}%")
-          col2.metric(label='Precision', value=f"{float(project_metadata[version_number]['model']['precision'])}%")
-          col2.metric(label='Recall', value=f"{float(project_metadata[version_number]['model']['recall'])}%")
-          col3.metric(label='Train Set Image Count', value=project.splits['train'])
-          col3.metric(label='Valid Set Image Count', value=project.splits['valid'])
-          col3.metric(label='Test Set Image Count', value=project.splits['test'])
-      except KeyError:
-        continue
+        try:
+            if int(project_metadata[version_number]['model']['id'].split('/')[1]) == int(version.version):
+                project_endpoint = st.write(f"#### Inference Endpoint: {project_metadata[version_number]['model']['endpoint']}")
+                model_id = st.write(f"#### Model ID: {project_metadata[version_number]['model']['id']}")
+                version_name  = st.write(f"#### Version Name: {project_metadata[version_number]['name']}")
+                input_img_size = st.write(f"Input Image Size for Model Training (pixels, px):")
+                width_metric, height_metric = st.columns(2)
+                width_metric.metric(label='Pixel Width', value=project_metadata[version_number]['preprocessing']['resize']['width'])
+                height_metric.metric(label='Pixel Height', value=project_metadata[version_number]['preprocessing']['resize']['height'])
 
-    col4, col5, col6 = st.columns(3)
-    col4.write('Preprocessing steps applied:')
-    col4.json(version.preprocessing)
-    col5.write('Augmentation steps applied:')
-    col5.json(version.augmentation)
-    col6.metric(label='Train Set', value=version.splits['train'], delta=f"Increased by Factor of {(version.splits['train'] / project.splits['train'])}")
-    col6.metric(label='Valid Set', value=version.splits['valid'], delta="No Change")
-    col6.metric(label='Test Set', value=version.splits['test'], delta="No Change")
+                if project_metadata[version_number]['model']['fromScratch']:
+                    train_checkpoint = 'Checkpoint'
+                    st.write(f"#### Version trained from {train_checkpoint}")
+                elif project_metadata[version_number]['model']['fromScratch'] is False:
+                    train_checkpoint = 'Scratch'
+                    train_checkpoint = st.write(f"#### Version trained from {train_checkpoint}")
+                else:
+                    train_checkpoint = 'Not Yet Trained'
+                    train_checkpoint = st.write(f"#### Version is {train_checkpoint}")
+        except KeyError:
+            continue
 
-##########
-##### Set up sidebar.
-##########
+    ## Pull in default image or user-selected image.
+    if uploaded_file is None:
+        # Default image.
+        default_img_path = "images/test_box.jpg"
+        image = Image.open(default_img_path)
 
-# Add in location to select image.
-st.sidebar.write("#### Select an image to upload.")
-uploaded_file = st.sidebar.file_uploader("",
-                                         type=['png', 'jpg', 'jpeg'],
-                                         accept_multiple_files=False)
+    else:
+        # User-selected image.
+        image = Image.open(uploaded_file)
 
-st.sidebar.write("[Find additional images on Roboflow Universe.](https://universe.roboflow.com/)")
+    original_image = image
 
-## Add in sliders.
-confidence_threshold = st.sidebar.slider("Confidence threshold: What is the minimum acceptable confidence level for displaying a bounding box?", 0.0, 1.0, 0.5, 0.01)
-overlap_threshold = st.sidebar.slider("Overlap threshold: What is the maximum amount of overlap permitted between visible bounding boxes?", 0.0, 1.0, 0.5, 0.01)
+    ## Subtitle.
+    st.write('### Inferenced/Prediction Image')
+    
+    # Display response image.
+    pil_image_drawBoxes, df_drawBoxes, json_values = drawBoxes(model,image)
+    st.image(pil_image_drawBoxes,
+            use_column_width=True)
+    # Display original image.
+    st.write("#### Original Image")
+    st.image(original_image,
+            use_column_width=True)
 
-image = Image.open("./images/roboflow_logo.png")
-st.sidebar.image(image,
-                 use_column_width=True)
+    json_tab, statistics_tab, project_tab = st.tabs(["Results & JSON Output", "Prediction Statistics", "Project Info"])
 
-image = Image.open("./images/streamlit_logo.png")
-st.sidebar.image(image,
-                 use_column_width=True)
+    with json_tab:
+        ## Display results dataframe in main app.
+        st.write('### Prediction Results (Pandas DataFrame)')
+        st.dataframe(df_drawBoxes)
+        ## Display the JSON in main app.
+        st.write('### JSON Output')
+        st.write(json_values)
+
+    with statistics_tab:
+        ## Summary statistics section in main app.
+        st.write('### Summary Statistics')
+        st.metric(label='Number of Bounding Boxes (ignoring overlap thresholds)', value=f"{len(df_drawBoxes.index)}")
+        st.metric(label='Average Confidence Level of Bounding Boxes:', value=f"{(np.round(np.mean(df_drawBoxes['confidence'].to_numpy()),4))}")
+
+        ## Histogram in main app.
+        st.write('### Histogram of Confidence Levels')
+        fig, ax = plt.subplots()
+        ax.hist(df_drawBoxes['confidence'], bins=10, range=(0.0,1.0))
+        st.pyplot(fig)
+
+    with project_tab:
+        st.write(f"Annotation Group Name: {project.annotation}")
+        col1, col2, col3 = st.columns(3)
+        for version_number in range(len(project_metadata)):
+            try:
+                if int(project_metadata[version_number]['model']['id'].split('/')[1]) == int(version.version):
+                    col1.write(f'Total images in the version: {version.images}')
+                    col1.metric(label='Augmented Train Set Image Count', value=version.splits['train'])
+                    col2.metric(label='mean Average Precision (mAP)', value=f"{float(project_metadata[version_number]['model']['map'])}%")
+                    col2.metric(label='Precision', value=f"{float(project_metadata[version_number]['model']['precision'])}%")
+                    col2.metric(label='Recall', value=f"{float(project_metadata[version_number]['model']['recall'])}%")
+                    col3.metric(label='Train Set Image Count', value=project.splits['train'])
+                    col3.metric(label='Valid Set Image Count', value=project.splits['valid'])
+                    col3.metric(label='Test Set Image Count', value=project.splits['test'])
+            except KeyError:
+                continue
+
+        col4, col5, col6 = st.columns(3)
+        col4.write('Preprocessing steps applied:')
+        col4.json(version.preprocessing)
+        col5.write('Augmentation steps applied:')
+        col5.json(version.augmentation)
+        col6.metric(label='Train Set', value=version.splits['train'], delta=f"Increased by Factor of {(version.splits['train'] / project.splits['train'])}")
+        col6.metric(label='Valid Set', value=version.splits['valid'], delta="No Change")
+        col6.metric(label='Test Set', value=version.splits['test'], delta="No Change")
 
 ##########
 ##### Set up project access.
@@ -209,18 +278,6 @@ st.sidebar.image(image,
 
 ## Title.
 st.write("# Roboflow Object Detection Tests")
-
-workspace_id, model_id, version_number, private_api_key = ('', '', '', '')
-
-## store initial session state values
-if 'workspace_id' not in st.session_state:
-  st.session_state['workspace_id'] = ''
-if 'model_id' not in st.session_state:
-  st.session_state['model_id'] = ''
-if 'version_number' not in st.session_state:
-  st.session_state['version_number'] = ''
-if 'private_api_key' not in st.session_state:
-  st.session_state['private_api_key'] = ''
 
 with st.form("project_access"):
   workspace_id = st.text_input('Workspace ID', key='workspace_id',
