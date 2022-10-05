@@ -34,11 +34,11 @@ if 'box_type' not in st.session_state:
 ##########
 #### Set up main app logic
 ##########
-def drawBoxes(model_object, img_path, include_class,
+def drawBoxes(model_object, open_cv_image, include_class,
               box_type, font = cv2.FONT_HERSHEY_SIMPLEX):
     
     collected_predictions = pd.DataFrame(columns=['class', 'confidence', 'x0', 'x1', 'y0', 'y1', 'box area'])
-    img = cv2.imread(img_path)
+    img = open_cv_image
     # perform inference on the selected image
     predictions = model_object.predict(img_path, confidence=int(st.session_state['confidence_threshold']),
                                     overlap=st.session_state['overlap_threshold'])
@@ -156,23 +156,26 @@ def run_inference():
         except KeyError:
             continue
 
+    ## Subtitle.
+    st.write('### Inferenced/Prediction Image')
+    
     ## Pull in default image or user-selected image.
     if uploaded_file is None:
         # Default image.
         default_img_path = "images/test_box.jpg"
         image = Image.open(default_img_path)
-
+        open_cv_image = cv2.imread(default_img_path)
+        
     else:
         # User-selected image.
         image = Image.open(uploaded_file)
+        open_cv_image = cv2.imread(uploaded_file)
 
+    original_opencv_image = open_cv_image
     original_image = image
-
-    ## Subtitle.
-    st.write('### Inferenced/Prediction Image')
     
     # Display response image.
-    pil_image_drawBoxes, df_drawBoxes, json_values = drawBoxes(model,image, st.session_state['include_class'],
+    pil_image_drawBoxes, df_drawBoxes, json_values = drawBoxes(model, open_cv_image, st.session_state['include_class'],
                                                                st.session_state['include_bbox'],
                                                                st.session_state['box_type'])
 
