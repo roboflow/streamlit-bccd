@@ -201,7 +201,7 @@ def run_inference():
         image = Image.open(uploaded_file)
         original_image = image
         opencv_convert = image.convert('RGB')
-        open_cv_image = numpy.array(opencv_convert)
+        open_cv_image = np.array(opencv_convert)
         # Convert RGB to BGR: OpenCV deals with BGR images rather than RGB
         open_cv_image = open_cv_image[:, :, ::-1].copy() 
         # Display response image.
