@@ -13,12 +13,31 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from roboflow import Roboflow
 
+
+## store initial session state values
+workspace_id, model_id, version_number, private_api_key = ('', '', '', '')
+if 'workspace_id' not in st.session_state:
+    st.session_state['workspace_id'] = ''
+if 'model_id' not in st.session_state:
+    st.session_state['model_id'] = ''
+if 'version_number' not in st.session_state:
+    st.session_state['version_number'] = ''
+if 'private_api_key' not in st.session_state:
+    st.session_state['private_api_key'] = ''
+if 'image_view' not in st.session_state:
+    st.session_state['image_view']
+if 'include_bbox' not in st.session_state:
+    st.session_state['include_bbox'] = True
+if 'include_class' not in st.session_state:
+    st.session_state['include_class'] = True
+if 'box_type' not in st.session_state:
+    st.session_state['box_type'] = 'regular'
+
 ##########
 #### Set up main app logic
 ##########
 def drawBoxes(model_object, img_path, font = cv2.FONT_HERSHEY_SIMPLEX,
-                view_img = st.session_state['image_view'], include_bbox = st.session_state['include_bbox'],
-                include_class = st.session_state['include_class'], box_type = st.session_state['box_type']):
+              view_img, include_bbox, include_class, box_type):
     
     collected_predictions = pd.DataFrame(columns=['class', 'confidence', 'x0', 'x1', 'y0', 'y1', 'box area'])
     img = cv2.imread(img_path)
@@ -155,7 +174,10 @@ def run_inference():
     st.write('### Inferenced/Prediction Image')
     
     # Display response image.
-    pil_image_drawBoxes, df_drawBoxes, json_values = drawBoxes(model,image)
+    pil_image_drawBoxes, df_drawBoxes, json_values = drawBoxes(model,image, st.session_state['image_view'],
+                                                              st.session_state['include_bbox'], st.session_state['include_class']
+                                                              st.session_state['box_type'])
+
     st.image(pil_image_drawBoxes,
             use_column_width=True)
     # Display original image.
@@ -214,27 +236,6 @@ def run_inference():
 ##########
 ##### Set up sidebar.
 ##########
-workspace_id, model_id, version_number, private_api_key = ('', '', '', '')
-
-## store initial session state values
-if 'workspace_id' not in st.session_state:
-    st.session_state['workspace_id'] = ''
-if 'model_id' not in st.session_state:
-    st.session_state['model_id'] = ''
-if 'version_number' not in st.session_state:
-    st.session_state['version_number'] = ''
-if 'private_api_key' not in st.session_state:
-    st.session_state['private_api_key'] = ''
-if 'image_view' not in st.session_state:
-    st.session_state['image_view']
-if 'include_bbox' not in st.session_state:
-    st.session_state['include_bbox'] = True
-if 'include_class' not in st.session_state:
-    st.session_state['include_class'] = True
-if 'box_type' not in st.session_state:
-    st.session_state['box_type'] = 'regular'
-
-
 # Add in location to select image.
 st.sidebar.write("#### Select an image to upload.")
 uploaded_file = st.sidebar.file_uploader("",
