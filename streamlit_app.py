@@ -175,7 +175,7 @@ def run_inference():
     
     # Display response image.
     pil_image_drawBoxes, df_drawBoxes, json_values = drawBoxes(model,image, st.session_state['image_view'],
-                                                              st.session_state['include_bbox'], st.session_state['include_class']
+                                                              st.session_state['include_bbox'], st.session_state['include_class'],
                                                               st.session_state['box_type'])
 
     st.image(pil_image_drawBoxes,
