@@ -43,7 +43,7 @@ def drawBoxes(model_object, img_object, uploaded_file, show_bbox, show_class_lab
     
     collected_predictions = pd.DataFrame(columns=['class', 'confidence', 'x0', 'x1', 'y0', 'y1', 'box area'])
     
-    if isinstance(uploaded_file, str)::
+    if isinstance(uploaded_file, str):
         img = cv2.imread(uploaded_file)
         # perform inference on the selected image
         predictions = model_object.predict(uploaded_file, confidence=int(st.session_state['confidence_threshold']),
