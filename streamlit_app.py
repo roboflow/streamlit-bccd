@@ -205,9 +205,8 @@ def run_inference():
         # Convert RGB to BGR: OpenCV deals with BGR images rather than RGB
         open_cv_image = open_cv_image[:, :, ::-1].copy()
         # Convert PIL image to byte-string so it can be sent for prediction to the Roboflow Python Package
-        pil_im = Image.fromarray(image)
         b = io.BytesIO()
-        pil_im.save(b, 'jpeg')
+        image.save(b, format='JPEG')
         im_bytes = b.getvalue() 
         # Display response image.
         pil_image_drawBoxes, df_drawBoxes, json_values = drawBoxes(model, open_cv_image, im_bytes,
