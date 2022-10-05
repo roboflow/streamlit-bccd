@@ -25,7 +25,7 @@ if 'version_number' not in st.session_state:
 if 'private_api_key' not in st.session_state:
     st.session_state['private_api_key'] = ''
 if 'image_view' not in st.session_state:
-    st.session_state['image_view']
+    st.session_state['image_view'] = True
 if 'include_bbox' not in st.session_state:
     st.session_state['include_bbox'] = True
 if 'include_class' not in st.session_state:
