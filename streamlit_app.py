@@ -105,6 +105,19 @@ def drawBoxes(model_object, img_path, show_bbox, show_class_label,
             if show_bbox == 'Yes':
                 # draw/place bounding boxes on image
                 cv2.rectangle(img, start_point, end_point, color=(0,0,0), thickness=2)
+            
+            box = [(x0, y0), (x1, y1)]
+            blur_x = int(bounding_box['x'] - bounding_box['width'] / 2)
+            blur_y = int(bounding_box['y'] - bounding_box['height'] / 2)
+            blur_width = int(bounding_box['width'])
+            blur_height = int(bounding_box['height'])
+            # region of interest (ROI), or area to blur
+            roi = img[blur_y:blur_y+blur_height, blur_x:blur_x+blur_width]
+
+            # ADD BLURRED BBOXES
+            # set blur to (31,31) or (51,51) based on amount of blur desired
+            blur_image = cv2.GaussianBlur(roi,(51,51),0)
+            img[blur_y:blur_y+blur_height, blur_x:blur_x+blur_width] = blur_image
 
             if show_class_label == 'Show Labels':
                 # add class name with filled background
