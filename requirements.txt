@@ -6,4 +6,4 @@ numpy
 matplotlib
 roboflow
 pandas
-opencv-python
+opencv-python-headless
