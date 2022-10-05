@@ -66,11 +66,11 @@ def drawBoxes(model_object, img_path, include_class,
         start_point = (int(x0), int(y0))
         end_point = (int(x1), int(y1))
         if box_type == 'regular':
-            if include_bbox:
+            if include_bbox == 'Yes':
                 # draw/place bounding boxes on image
                 cv2.rectangle(img, start_point, end_point, color=(0,0,0), thickness=2)
 
-            if include_class:
+            if include_class == 'Show Labels':
                 # add class name with filled background
                 cv2.rectangle(img, (int(x0), int(y0)), (int(x0) + 40, int(y0) - 20), color=(0,0,0),
                         thickness=-1)
@@ -84,11 +84,11 @@ def drawBoxes(model_object, img_path, include_class,
                     )
 
         if box_type == 'fill':
-            if include_bbox:
+            if include_bbox == 'Yes':
                 # draw/place bounding boxes on image
                 cv2.rectangle(img, start_point, end_point, color=(0,0,0), thickness=-1)
 
-            if include_class:
+            if include_class == 'Show Labels':
                 # add class name with filled background
                 cv2.rectangle(img, (int(x0), int(y0)), (int(x0) + 40, int(y0) - 20), color=(0,0,0),
                         thickness=-1)
@@ -102,11 +102,11 @@ def drawBoxes(model_object, img_path, include_class,
                     )
 
         if box_type == 'blur':
-            if include_bbox:
+            if include_bbox == 'Yes':
                 # draw/place bounding boxes on image
                 cv2.rectangle(img, start_point, end_point, color=(0,0,0), thickness=2)
 
-            if include_class:
+            if include_class == 'Show Labels':
                 # add class name with filled background
                 cv2.rectangle(img, (int(x0), int(y0)), (int(x0) + 40, int(y0) - 20), color=(0,0,0),
                         thickness=-1)
@@ -119,10 +119,8 @@ def drawBoxes(model_object, img_path, include_class,
                     thickness=1#thickness/"weight" of text
                     )
 
-        cv2_image = cv2.imwrite('./result.jpg', img)
         # convert from openCV2 to PIL. Notice the COLOR_BGR2RGB which means that 
         # the color is converted from BGR to RGB when going from OpenCV image to PIL image
-        img = cv2.imread('./result.jpg')
         color_converted = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
         pil_image = Image.fromarray(color_converted)
 
