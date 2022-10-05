@@ -167,7 +167,7 @@ def run_inference():
         open_cv_image = cv2.imread(default_img_path)
         original_opencv_image = open_cv_image
         # Display response image.
-        pil_image_drawBoxes, df_drawBoxes, json_values = drawBoxes(model, open_cv_image, default_image_path,
+        pil_image_drawBoxes, df_drawBoxes, json_values = drawBoxes(model, open_cv_image, default_img_path,
                                                                    st.session_state['include_class'],
                                                                    st.session_state['include_bbox'],
                                                                    st.session_state['box_type'])
