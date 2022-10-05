@@ -107,67 +107,6 @@ def drawBoxes(model_object, img_path, font = cv2.FONT_HERSHEY_SIMPLEX,
 
 
 def run_inference():
-    ##########
-    ##### Set up sidebar.
-    ##########
-    workspace_id, model_id, version_number, private_api_key = ('', '', '', '')
-
-    ## store initial session state values
-    if 'workspace_id' not in st.session_state:
-        st.session_state['workspace_id'] = ''
-    if 'model_id' not in st.session_state:
-        st.session_state['model_id'] = ''
-    if 'version_number' not in st.session_state:
-        st.session_state['version_number'] = ''
-    if 'private_api_key' not in st.session_state:
-        st.session_state['private_api_key'] = ''
-    if 'image_view' not in st.session_state:
-        st.session_state['image_view']
-    if 'include_bbox' not in st.session_state:
-        st.session_state['include_bbox'] = True
-    if 'include_class' not in st.session_state:
-        st.session_state['include_class'] = True
-    if 'box_type' not in st.session_state:
-        st.session_state['box_type'] = 'regular'
-
-
-    # Add in location to select image.
-    st.sidebar.write("#### Select an image to upload.")
-    uploaded_file = st.sidebar.file_uploader("",
-                                            type=['png', 'jpg', 'jpeg'],
-                                            accept_multiple_files=False)
-
-    st.sidebar.write("[Find additional images on Roboflow Universe.](https://universe.roboflow.com/)")
-    st.sidebar.write("This project is publicly [available for viewing and download here](https://universe.roboflow.com/mohamed-traore-2ekkp/boxes-on-a-conveyer-belt/)")
-
-    ## Add in sliders.
-    view_img = st.sidebar.radio("View Inference Image Result As:",
-                                options=['Regular Bounding Boxes', 'Filled Bounding Boxes', 'Blurred Bounding Boxes', 'Do Not View - JSON Only'],
-                                key='image_view')
-                                    
-    show_bbox = st.sidebar.radio("Show Bounding Boxes:",
-                                options=['Yes', 'No'],
-                                key='include_bbox')
-
-    show_class_label = st.sidebar.radio("Show Class Labels:",
-                                        options=['Show Labels', 'Hide Labels'],
-                                        key='include_class')
-                
-    show_box_type = st.sidebar.selectbox("Display Bounding Boxes As:",
-                                        options=('regular', 'fill', 'blur'),
-                                        key='box_type')
-                                        
-    confidence_threshold = st.sidebar.slider("Confidence threshold: What is the minimum acceptable confidence level for displaying a bounding box?", 0.0, 1.0, 0.5, 0.01)
-    overlap_threshold = st.sidebar.slider("Overlap threshold: What is the maximum amount of overlap permitted between visible bounding boxes?", 0.0, 1.0, 0.5, 0.01)
-
-    image = Image.open("./images/roboflow_logo.png")
-    st.sidebar.image(image,
-                    use_column_width=True)
-
-    image = Image.open("./images/streamlit_logo.png")
-    st.sidebar.image(image,
-                    use_column_width=True)
-    
     rf = Roboflow(api_key=st.session_state['private_api_key'])
     project = rf.workspace(st.session_state['workspace_id']).project(st.session_state['model_id'])
     project_metadata = project.get_version_information()
@@ -272,6 +211,67 @@ def run_inference():
         col6.metric(label='Valid Set', value=version.splits['valid'], delta="No Change")
         col6.metric(label='Test Set', value=version.splits['test'], delta="No Change")
 
+##########
+##### Set up sidebar.
+##########
+workspace_id, model_id, version_number, private_api_key = ('', '', '', '')
+
+## store initial session state values
+if 'workspace_id' not in st.session_state:
+    st.session_state['workspace_id'] = ''
+if 'model_id' not in st.session_state:
+    st.session_state['model_id'] = ''
+if 'version_number' not in st.session_state:
+    st.session_state['version_number'] = ''
+if 'private_api_key' not in st.session_state:
+    st.session_state['private_api_key'] = ''
+if 'image_view' not in st.session_state:
+    st.session_state['image_view']
+if 'include_bbox' not in st.session_state:
+    st.session_state['include_bbox'] = True
+if 'include_class' not in st.session_state:
+    st.session_state['include_class'] = True
+if 'box_type' not in st.session_state:
+    st.session_state['box_type'] = 'regular'
+
+
+# Add in location to select image.
+st.sidebar.write("#### Select an image to upload.")
+uploaded_file = st.sidebar.file_uploader("",
+                                        type=['png', 'jpg', 'jpeg'],
+                                        accept_multiple_files=False)
+
+st.sidebar.write("[Find additional images on Roboflow Universe.](https://universe.roboflow.com/)")
+st.sidebar.write("This project is publicly [available for viewing and download here](https://universe.roboflow.com/mohamed-traore-2ekkp/boxes-on-a-conveyer-belt/)")
+
+## Add in sliders.
+view_img = st.sidebar.radio("View Inference Image Result As:",
+                            options=['Regular Bounding Boxes', 'Filled Bounding Boxes', 'Blurred Bounding Boxes', 'Do Not View - JSON Only'],
+                            key='image_view')
+
+show_bbox = st.sidebar.radio("Show Bounding Boxes:",
+                            options=['Yes', 'No'],
+                            key='include_bbox')
+
+show_class_label = st.sidebar.radio("Show Class Labels:",
+                                    options=['Show Labels', 'Hide Labels'],
+                                    key='include_class')
+
+show_box_type = st.sidebar.selectbox("Display Bounding Boxes As:",
+                                    options=('regular', 'fill', 'blur'),
+                                    key='box_type')
+
+confidence_threshold = st.sidebar.slider("Confidence threshold: What is the minimum acceptable confidence level for displaying a bounding box?", 0.0, 1.0, 0.5, 0.01)
+overlap_threshold = st.sidebar.slider("Overlap threshold: What is the maximum amount of overlap permitted between visible bounding boxes?", 0.0, 1.0, 0.5, 0.01)
+
+image = Image.open("./images/roboflow_logo.png")
+st.sidebar.image(image,
+                use_column_width=True)
+
+image = Image.open("./images/streamlit_logo.png")
+st.sidebar.image(image,
+                use_column_width=True)
+        
 ##########
 ##### Set up project access.
 ##########
