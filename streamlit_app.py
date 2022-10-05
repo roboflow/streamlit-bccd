@@ -119,8 +119,10 @@ def drawBoxes(model_object, img_path, include_class,
                     thickness=1#thickness/"weight" of text
                     )
 
+        cv2_image = cv2.imwrite('./result.jpg', img)
         # convert from openCV2 to PIL. Notice the COLOR_BGR2RGB which means that 
         # the color is converted from BGR to RGB when going from OpenCV image to PIL image
+        img = cv2.imread('./result.jpg')
         color_converted = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
         pil_image = Image.fromarray(color_converted)
 
