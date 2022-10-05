@@ -24,8 +24,6 @@ if 'version_number' not in st.session_state:
     st.session_state['version_number'] = ''
 if 'private_api_key' not in st.session_state:
     st.session_state['private_api_key'] = ''
-if 'image_view' not in st.session_state:
-    st.session_state['image_view'] = True
 if 'include_bbox' not in st.session_state:
     st.session_state['include_bbox'] = True
 if 'include_class' not in st.session_state:
@@ -36,7 +34,7 @@ if 'box_type' not in st.session_state:
 ##########
 #### Set up main app logic
 ##########
-def drawBoxes(model_object, img_path, view_img, include_class,
+def drawBoxes(model_object, img_path, include_class,
               box_type, font = cv2.FONT_HERSHEY_SIMPLEX):
     
     collected_predictions = pd.DataFrame(columns=['class', 'confidence', 'x0', 'x1', 'y0', 'y1', 'box area'])
@@ -174,9 +172,9 @@ def run_inference():
     st.write('### Inferenced/Prediction Image')
     
     # Display response image.
-    pil_image_drawBoxes, df_drawBoxes, json_values = drawBoxes(model,image, st.session_state['image_view'],
-                                                              st.session_state['include_bbox'], st.session_state['include_class'],
-                                                              st.session_state['box_type'])
+    pil_image_drawBoxes, df_drawBoxes, json_values = drawBoxes(model,image, st.session_state['include_class'],
+                                                               st.session_state['include_bbox'],
+                                                               st.session_state['box_type'])
 
     st.image(pil_image_drawBoxes,
             use_column_width=True)
@@ -246,10 +244,6 @@ st.sidebar.write("[Find additional images on Roboflow Universe.](https://univers
 st.sidebar.write("This project is publicly [available for viewing and download here](https://universe.roboflow.com/mohamed-traore-2ekkp/boxes-on-a-conveyer-belt/)")
 
 ## Add in sliders.
-view_img = st.sidebar.radio("View Inference Image Result As:",
-                            options=['Regular Bounding Boxes', 'Filled Bounding Boxes', 'Blurred Bounding Boxes', 'Do Not View - JSON Only'],
-                            key='image_view')
-
 show_bbox = st.sidebar.radio("Show Bounding Boxes:",
                             options=['Yes', 'No'],
                             key='include_bbox')
