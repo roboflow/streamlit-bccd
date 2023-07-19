@@ -30,20 +30,20 @@ class ClassificationApp:
 
         predictions_json = predictions.json()
         class_name = predictions[0]
-        confidence_score = predictions[0]
-        cv2.putText(img,
-            f"Play Type: {class_name} | confidence: {confidence_score}",#text to place on image
-            (int(30), int(30)),#location of text
-            font,#font
-            1.2,#font scale
-            (255,255,255),#text color
-            thickness=3#thickness/"weight" of text
-            )
+        # class_name = predictions[0]
+        # cv2.putText(img,
+        #     f"Play Type: {class_name}",#text to place on image
+        #     (int(30), int(30)),#location of text
+        #     font,#font
+        #     1.2,#font scale
+        #     (255,255,255),#text color
+        #     thickness=3#thickness/"weight" of text
+        #     )
             
         color_converted = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
         pil_image = Image.fromarray(color_converted)
         
-        return pil_image, predictions_json
+        return pil_image, predictions_json, class_name
 
     def run_inference(self):
         rf = Roboflow(api_key=self.private_api_key)
@@ -86,8 +86,8 @@ class ClassificationApp:
             original_image = image
             open_cv_image = cv2.imread(default_img_path)
             original_opencv_image = open_cv_image
-            # Display response image.
-            pil_image_drawBoxes, json_values = self.draw_boxes(model, default_img_path, default_img_path)
+            # Display response image.t2ATXDlCF9qKmmP4E1Ao
+            pil_image_drawBoxes, json_values, class_pred = self.draw_boxes(model, default_img_path, default_img_path)
             
         else:
             # User-selected image.
@@ -106,6 +106,9 @@ class ClassificationApp:
         
         st.image(pil_image_drawBoxes,
                 use_column_width=True)
+        
+        st.write(f"#### {class_pred}")
+
         # Display original image.
         st.write("#### Original Image")
         st.image(original_image,
